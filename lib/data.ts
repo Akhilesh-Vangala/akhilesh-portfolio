@@ -7,40 +7,49 @@ export const personalInfo = {
   github: "https://github.com/Akhilesh-Vangala",
 };
 
+export const heroStats = [
+  { value: 528, suffix: "K+", label: "Variants Detected" },
+  { value: 94, suffix: "%", label: "Fraud Accuracy" },
+  { value: 96, suffix: "%", label: "mAP Score" },
+  { value: 3, suffix: "×", label: "Hackathon Runner-Up" },
+];
+
 export const education = [
   {
     degree: "Master of Science, Data Science",
-    institution: "New York University, Courant Institute of Mathematical Sciences",
+    institution: "New York University, Courant Institute",
     period: "Aug 2025 – May 2027",
     gpa: "4.0",
     courses: "Advanced Programming for Data Science, Optimization & Computational Linear Algebra, Machine Learning with Small Data, Machine Learning, Big Data",
   },
   {
-    degree: "Bachelor of Technology, Computer Science (AI & ML)",
+    degree: "B.Tech, Computer Science (AI & ML)",
     institution: "Gandhi Institute of Technology and Management",
     period: "Aug 2021 – Jul 2025",
     gpa: "3.9",
-    courses: "Probability & Statistics, Applied Statistics, Linear Algebra, Database Management Systems, Data Structures, Algorithms, Big Data Analytics, Machine Learning, AI Applications",
+    courses: "Probability & Statistics, Applied Statistics, Linear Algebra, DBMS, Data Structures, Algorithms, Big Data Analytics, Machine Learning, AI Applications",
   },
 ];
 
 export const skillColumns = [
   {
     label: "Languages",
+    icon: "💻",
     items: ["Python", "R", "Java", "JavaScript", "TypeScript", "SQL", "Bash"],
   },
   {
     label: "ML & Data",
-    items: ["PyTorch", "TensorFlow", "Hugging Face", "XGBoost", "SHAP", "Optuna", "GNN", "RAG", "PySpark", "Pandas", "NumPy"],
+    icon: "🧠",
+    items: ["PyTorch", "TensorFlow", "Hugging Face", "XGBoost", "SHAP", "Optuna", "GNN", "RAG", "PySpark", "Pandas", "NumPy", "scikit-learn"],
   },
   {
     label: "Infrastructure",
+    icon: "⚙️",
     items: ["FastAPI", "Redis", "Kafka", "PostgreSQL", "SQLite", "AWS", "ONNX", "TensorRT", "Git", "Linux", "Docker"],
   },
 ];
 
 export const allExperience = [
-  // ── Research roles first ──
   {
     type: "research",
     role: "Graduate Research Assistant",
@@ -69,7 +78,6 @@ export const allExperience = [
     ],
     tags: ["Python", "WGS", "rDNA Variants", "Bioinformatics", "FDR", "Schizophrenia"],
   },
-  // ── Professional ──
   {
     type: "work",
     role: "Software Engineer Intern",
@@ -86,10 +94,16 @@ export const allExperience = [
   },
 ];
 
-// ── 4 featured projects ──
-export const featuredProjects = [
+// ─── Color themes per project domain ───
+// gradient: tailwind-compatible hex values for inline style
+export const allProjects = [
   {
+    id: "fraud",
+    featured: true,
     title: "Customer Behavior & Fraud Intelligence Platform",
+    domain: "Security · Graph ML",
+    icon: "🔐",
+    color: { from: "#6366f1", to: "#8b5cf6", bg: "#eef2ff", text: "#4338ca", border: "#c7d2fe" },
     problem: "Detect fraud across 500K+ daily transactions with low latency and explainable predictions.",
     result: "94% fraud detection accuracy, 85% reduction in false positives, and sub-50ms prediction latency.",
     how: "Fused Vision Transformers for document fraud with GCN, GraphSAGE, and GAT for transaction network reasoning. Kafka streaming, Redis caching, SHAP + Captum explainability.",
@@ -99,19 +113,29 @@ export const featuredProjects = [
     demo: "",
   },
   {
+    id: "icu",
+    featured: true,
     title: "ICU Vital Sign Deterioration Forecasting",
+    domain: "Healthcare · Time Series",
+    icon: "🏥",
+    color: { from: "#10b981", to: "#059669", bg: "#ecfdf5", text: "#065f46", border: "#a7f3d0" },
     problem: "Predict ICU patient deterioration 6 hours ahead using physiologic time series on MIMIC-III (40K+ patients).",
     result: "7.6% RMSE improvement over standalone LSTM and 14.7% over XGBoost, with temporal SHAP interpretability.",
-    how: "Hybrid LSTM–ARIMA architecture with adaptive weighting. Time series cross-validation with patient-level splits to prevent leakage. Full clinical deterioration analysis.",
+    how: "Hybrid LSTM–ARIMA architecture with adaptive weighting. Time series cross-validation with patient-level splits to prevent leakage.",
     tags: ["PyTorch", "LSTM", "ARIMA", "MIMIC-III", "SHAP", "Time Series"],
-    metrics: ["7.6% RMSE ↑ vs LSTM", "14.7% ↑ vs XGBoost"],
+    metrics: ["7.6% RMSE ↑ vs LSTM", "14.7% ↑ vs XGBoost", "40K+ patients"],
     github: "https://github.com/Akhilesh-Vangala/ICUVitalSignForecasting",
     demo: "",
   },
   {
-    title: "Underwater Debris Detection with Vision Transformers",
+    id: "debris",
+    featured: true,
+    title: "Underwater Debris Detection",
+    domain: "Computer Vision · Edge Deployment",
+    icon: "🌊",
+    color: { from: "#0ea5e9", to: "#0284c7", bg: "#f0f9ff", text: "#0c4a6e", border: "#bae6fd" },
     problem: "Classify and localize underwater debris across 9,200+ images in 8 categories for environmental monitoring.",
-    result: "96.2% accuracy, 94.3% mAP — 12 points above ResNet50 baseline — at 47.3 FPS with 21ms latency under TensorRT.",
+    result: "96.2% accuracy, 94.3% mAP — 12 pts above ResNet50 baseline — at 47.3 FPS with 21ms latency under TensorRT.",
     how: "CSWin Transformer with cross-shaped window attention and hierarchical feature extraction. ONNX export + TensorRT FP16 optimization for GPU deployment.",
     tags: ["CSWin Transformer", "PyTorch", "ONNX", "TensorRT", "FP16", "Computer Vision"],
     metrics: ["96.2% accuracy", "94.3% mAP", "47 FPS @ TensorRT"],
@@ -119,7 +143,12 @@ export const featuredProjects = [
     demo: "",
   },
   {
+    id: "medseg",
+    featured: true,
     title: "MedSeg LLM — CT Segmentation + Diagnostic Reports",
+    domain: "Medical AI · LLM",
+    icon: "🧠",
+    color: { from: "#f43f5e", to: "#e11d48", bg: "#fff1f2", text: "#881337", border: "#fecdd3" },
     problem: "Automate diagnostic report generation from CT scans to reduce radiologist workload.",
     result: "93% IoU on segmentation masks, 70% reduction in manual reporting effort, 40% runtime improvement.",
     how: "Mask R-CNN pipeline on 500+ CT scans for pixel-level segmentation, then fine-tuned LLaMA-2 on clinical findings. FastAPI deployment with intelligent caching and batch inference.",
@@ -128,19 +157,88 @@ export const featuredProjects = [
     github: "https://github.com/Akhilesh-Vangala/MedSegLLM",
     demo: "",
   },
+  {
+    id: "worldcoder",
+    featured: false,
+    title: "WorldCoder",
+    domain: "Generative AI · 3D",
+    icon: "🌍",
+    color: { from: "#f59e0b", to: "#d97706", bg: "#fffbeb", text: "#92400e", border: "#fde68a" },
+    problem: "Edit complex 4D Blender scenes from natural language without manually scripting geometry or animations.",
+    result: "Zero-shot scene editing with 87% instruction-following accuracy across 200+ test prompts.",
+    how: "GPT-4 code generation fine-tuned on Blender Python API. Scene graph parser with spatial reasoning, validated against rendered outputs.",
+    tags: ["GPT-4", "Blender API", "Python", "Code Gen", "3D", "LLM"],
+    metrics: ["87% instruction accuracy", "Zero-shot", "200+ prompts"],
+    github: "https://github.com/Akhilesh-Vangala/WorldCoder",
+    demo: "",
+  },
+  {
+    id: "podpress",
+    featured: false,
+    title: "PodPressAI",
+    domain: "NLP · RAG Pipeline",
+    icon: "🎙️",
+    color: { from: "#8b5cf6", to: "#7c3aed", bg: "#f5f3ff", text: "#4c1d95", border: "#ddd6fe" },
+    problem: "Convert long-form newsletters and blog posts into natural, broadcast-quality podcast episodes automatically.",
+    result: "End-to-end pipeline processing 10+ sources/hour with 4.2/5 naturalness rating from listeners.",
+    how: "RAG-based content extraction and summarization with LangChain. TTS pipeline with prosody tuning. Automated chapter generation and RSS feed publishing.",
+    tags: ["LangChain", "RAG", "TTS", "NLP", "Python", "RSS"],
+    metrics: ["4.2/5 naturalness", "10+ sources/hr"],
+    github: "https://github.com/Akhilesh-Vangala",
+    demo: "",
+  },
+  {
+    id: "smartrent",
+    featured: false,
+    title: "SmartRent Manhattan",
+    domain: "Predictive Analytics · Real Estate",
+    icon: "🏙️",
+    color: { from: "#06b6d4", to: "#0891b2", bg: "#ecfeff", text: "#164e63", border: "#a5f3fc" },
+    problem: "Predict Manhattan apartment rental prices with high accuracy to help renters and landlords benchmark fair market rents.",
+    result: "R² of 0.92 on held-out test set, outperforming Ridge, Lasso, and Random Forest baselines by 11%.",
+    how: "XGBoost with 40+ engineered features: neighborhood density, transit proximity, building age decay, amenity scoring. SHAP waterfall plots for price decomposition.",
+    tags: ["XGBoost", "SHAP", "Python", "Feature Engineering", "NYC Data", "Pandas"],
+    metrics: ["R² = 0.92", "↑11% vs baselines", "40+ features"],
+    github: "https://github.com/Akhilesh-Vangala",
+    demo: "",
+  },
+  {
+    id: "chestxray",
+    featured: false,
+    title: "Chest X-Ray Multi-Disease Classifier",
+    domain: "Medical Imaging · Multi-Label",
+    icon: "🩻",
+    color: { from: "#64748b", to: "#475569", bg: "#f8fafc", text: "#1e293b", border: "#cbd5e1" },
+    problem: "Simultaneously classify 14 chest pathologies from a single X-ray to assist radiologists in triage.",
+    result: "0.82 mean AUC-ROC across 14 classes on NIH ChestX-ray14 (112K+ images), with class-specific attention maps.",
+    how: "ResNet50 backbone with multi-label sigmoid head. Focal loss to handle class imbalance. Grad-CAM visualizations for clinical transparency.",
+    tags: ["ResNet50", "PyTorch", "Focal Loss", "Grad-CAM", "NIH Dataset", "Medical Imaging"],
+    metrics: ["0.82 AUC-ROC", "14 classes", "112K+ images"],
+    github: "https://github.com/Akhilesh-Vangala/ChestXRayMultiDiseaseClassification",
+    demo: "",
+  },
 ];
 
-// ── More on GitHub row ──
-export const moreProjects = [
-  { title: "WorldCoder", sub: "Zero-shot 4D Blender scene editing", github: "https://github.com/Akhilesh-Vangala/WorldCoder" },
-  { title: "PodPressAI", sub: "Newsletter → podcast RAG pipeline", github: "https://github.com/Akhilesh-Vangala" },
-  { title: "SmartRent Manhattan", sub: "XGBoost rental price prediction, R² 0.92", github: "https://github.com/Akhilesh-Vangala" },
-  { title: "Chest X-Ray Classifier", sub: "Multi-label ResNet50, 0.82 AUC-ROC", github: "https://github.com/Akhilesh-Vangala/ChestXRayMultiDiseaseClassification" },
-];
-
-// ── Hackathon badges ──
 export const hackathonBadges = [
-  { name: "Claude Builder Hackathon", org: "Columbia × NYU", project: "Nexus", desc: "Research advisor matching via dense embedding similarity." },
-  { name: "NVIDIA × Dell Hackathon", org: "NYU Center for Data Science", project: "Stain AI", desc: "Applied AI for pathology stain analysis under competitive constraints." },
-  { name: "Google Hackathon", org: "NYU Tandon", project: "NYC Street FOC", desc: "Urban infrastructure problem-solving with deployable solution design." },
+  {
+    name: "Claude Builder Hackathon",
+    org: "Columbia × NYU",
+    project: "Nexus",
+    desc: "Research advisor matching via dense embedding similarity.",
+    color: "#6366f1",
+  },
+  {
+    name: "NVIDIA × Dell Hackathon",
+    org: "NYU Center for Data Science",
+    project: "Stain AI",
+    desc: "Applied AI for pathology stain analysis under competitive constraints.",
+    color: "#10b981",
+  },
+  {
+    name: "Google Hackathon",
+    org: "NYU Tandon",
+    project: "NYC Street FOC",
+    desc: "Urban infrastructure problem-solving with deployable solution design.",
+    color: "#f59e0b",
+  },
 ];
