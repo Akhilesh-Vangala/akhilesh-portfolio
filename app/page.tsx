@@ -3,16 +3,16 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, useInView, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import {
-  Mail, Phone, MapPin, ExternalLink, ChevronDown,
-  Menu, X, Trophy, BookOpen, Briefcase, Code,
-  GraduationCap, FlaskConical, Send, ArrowUpRight,
+  Mail, Phone, MapPin, ChevronDown, Menu, X, Trophy,
+  BookOpen, Briefcase, Code, GraduationCap, FlaskConical,
+  Download, ArrowUpRight, ExternalLink,
 } from "lucide-react";
 import {
-  personalInfo, education, skills, skillTags,
-  coreValues, research, experience, hackathons, projects,
+  personalInfo, education, skillColumns, allExperience,
+  featuredProjects, moreProjects, hackathonBadges,
 } from "@/lib/data";
 
-/* ══════════════════════════════════════════ SVG Icons */
+/* ── Icons ── */
 function GithubIcon({ className = "w-5 h-5" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
@@ -28,153 +28,84 @@ function LinkedinIcon({ className = "w-5 h-5" }: { className?: string }) {
   );
 }
 
-/* ══════════════════════════════════════════ Neural Canvas (light mode) */
-function NeuralBackground() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const canvas = canvasRef.current; if (!canvas) return;
-    const ctx = canvas.getContext("2d"); if (!ctx) return;
-    let raf: number;
-    type Node = { x: number; y: number; vx: number; vy: number; r: number };
-    const nodes: Node[] = [];
-    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-    resize(); window.addEventListener("resize", resize);
-    for (let i = 0; i < 50; i++) {
-      nodes.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random()-.5)*.3, vy: (Math.random()-.5)*.3, r: Math.random()*1.5+0.5 });
-    }
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (const n of nodes) {
-        n.x += n.vx; n.y += n.vy;
-        if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
-        if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
-      }
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i+1; j < nodes.length; j++) {
-          const dx = nodes[i].x-nodes[j].x, dy = nodes[i].y-nodes[j].y;
-          const d = Math.sqrt(dx*dx+dy*dy);
-          if (d < 160) {
-            ctx.strokeStyle = `rgba(99,102,241,${(1-d/160)*0.07})`;
-            ctx.lineWidth = 0.8;
-            ctx.beginPath(); ctx.moveTo(nodes[i].x,nodes[i].y); ctx.lineTo(nodes[j].x,nodes[j].y); ctx.stroke();
-          }
-        }
-      }
-      for (const n of nodes) {
-        ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
-        ctx.fillStyle = "rgba(99,102,241,0.2)"; ctx.fill();
-      }
-      raf = requestAnimationFrame(draw);
-    };
-    draw();
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
-  }, []);
-  return <canvas ref={canvasRef} className="fixed inset-0 z-0 pointer-events-none" />;
-}
-
-/* ══════════════════════════════════════════ Mouse Spotlight */
-function MouseSpotlight() {
-  const [pos, setPos] = useState({ x: -9999, y: -9999 });
-  useEffect(() => {
-    const h = (e: MouseEvent) => setPos({ x: e.clientX, y: e.clientY });
-    window.addEventListener("mousemove", h);
-    return () => window.removeEventListener("mousemove", h);
-  }, []);
-  return (
-    <div className="fixed inset-0 z-0 pointer-events-none" style={{
-      background: `radial-gradient(500px circle at ${pos.x}px ${pos.y}px, rgba(99,102,241,0.04) 0%, transparent 60%)`
-    }} />
-  );
-}
-
-/* ══════════════════════════════════════════ Scroll Progress */
+/* ── Scroll Progress ── */
 function ScrollProgress() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 30 });
   return <motion.div className="scroll-prog" style={{ scaleX, transformOrigin: "left" }} />;
 }
 
-/* ══════════════════════════════════════════ Counter */
-function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
-  const [v, setV] = useState(0);
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true });
+/* ── Neural Canvas ── */
+function NeuralBackground() {
+  const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
-    if (!inView) return;
-    let cur = 0; const step = to/50;
-    const id = setInterval(() => { cur+=step; if(cur>=to){setV(to);clearInterval(id);}else setV(Math.floor(cur)); }, 28);
-    return () => clearInterval(id);
-  }, [inView, to]);
-  return <span ref={ref}>{v}{suffix}</span>;
-}
-
-/* ══════════════════════════════════════════ Typing */
-const ROLES = ["Data Scientist","ML Engineer","Graduate Researcher","Bioinformatics Builder","Deep Learning Engineer"];
-function TypedRole() {
-  const [idx,setIdx] = useState(0);
-  const [text,setText] = useState("");
-  const [del,setDel] = useState(false);
-  const [wait,setWait] = useState(false);
-  useEffect(() => {
-    if(wait){const t=setTimeout(()=>{setWait(false);setDel(true);},2000);return()=>clearTimeout(t);}
-    const cur=ROLES[idx];
-    if(!del){
-      if(text.length<cur.length){const t=setTimeout(()=>setText(cur.slice(0,text.length+1)),60);return()=>clearTimeout(t);}
-      setWait(true);
-    }else{
-      if(text.length>0){const t=setTimeout(()=>setText(text.slice(0,-1)),35);return()=>clearTimeout(t);}
-      setDel(false);setIdx(i=>(i+1)%ROLES.length);
-    }
-  },[text,del,idx,wait]);
-  return <span className="gt-shift font-black">{text}<span className="cur text-indigo-500">|</span></span>;
-}
-
-/* ══════════════════════════════════════════ 3D Tilt */
-function TiltCard({ children, className="" }: { children:React.ReactNode; className?:string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const onMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const el=ref.current; if(!el) return;
-    const r=el.getBoundingClientRect();
-    const x=(e.clientX-r.left)/r.width-0.5, y=(e.clientY-r.top)/r.height-0.5;
-    el.style.transform=`perspective(900px) rotateY(${x*6}deg) rotateX(${-y*6}deg) translateZ(4px)`;
+    const c = ref.current; if (!c) return;
+    const ctx = c.getContext("2d"); if (!ctx) return;
+    let raf: number;
+    type N = { x: number; y: number; vx: number; vy: number };
+    const nodes: N[] = [];
+    const resize = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
+    resize(); window.addEventListener("resize", resize);
+    for (let i = 0; i < 48; i++) nodes.push({ x: Math.random()*c.width, y: Math.random()*c.height, vx: (Math.random()-.5)*.28, vy: (Math.random()-.5)*.28 });
+    const draw = () => {
+      ctx.clearRect(0,0,c.width,c.height);
+      for (const n of nodes) {
+        n.x+=n.vx; n.y+=n.vy;
+        if(n.x<0||n.x>c.width) n.vx*=-1;
+        if(n.y<0||n.y>c.height) n.vy*=-1;
+      }
+      for (let i=0;i<nodes.length;i++) for(let j=i+1;j<nodes.length;j++){
+        const dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y, d=Math.sqrt(dx*dx+dy*dy);
+        if(d<155){ ctx.strokeStyle=`rgba(99,102,241,${(1-d/155)*0.055})`; ctx.lineWidth=0.7; ctx.beginPath(); ctx.moveTo(nodes[i].x,nodes[i].y); ctx.lineTo(nodes[j].x,nodes[j].y); ctx.stroke(); }
+      }
+      for (const n of nodes){ ctx.beginPath(); ctx.arc(n.x,n.y,1.2,0,Math.PI*2); ctx.fillStyle="rgba(99,102,241,0.18)"; ctx.fill(); }
+      raf=requestAnimationFrame(draw);
+    };
+    draw();
+    return ()=>{ cancelAnimationFrame(raf); window.removeEventListener("resize",resize); };
   },[]);
-  const onLeave = useCallback(()=>{ if(ref.current) ref.current.style.transform="perspective(900px) rotateY(0) rotateX(0) translateZ(0)"; },[]);
+  return <canvas ref={ref} className="fixed inset-0 z-0 pointer-events-none" />;
+}
+
+/* ── Animate helpers ── */
+function FadeIn({ children, delay=0, className="" }: { children:React.ReactNode; delay?:number; className?:string }) {
+  const ref=useRef(null); const io=useInView(ref,{once:true,margin:"-70px"});
+  return <motion.div ref={ref} initial={{opacity:0,y:24}} animate={io?{opacity:1,y:0}:{}} transition={{duration:0.6,delay,ease:[0.22,1,0.36,1]}} className={className}>{children}</motion.div>;
+}
+function SlideIn({ children, delay=0, className="" }: { children:React.ReactNode; delay?:number; className?:string }) {
+  const ref=useRef(null); const io=useInView(ref,{once:true,margin:"-60px"});
+  return <motion.div ref={ref} initial={{opacity:0,x:-20}} animate={io?{opacity:1,x:0}:{}} transition={{duration:0.55,delay,ease:[0.22,1,0.36,1]}} className={className}>{children}</motion.div>;
+}
+
+/* ── 3D Tilt ── */
+function TiltCard({ children, className="" }: { children:React.ReactNode; className?:string }) {
+  const ref=useRef<HTMLDivElement>(null);
+  const onMove=useCallback((e:React.MouseEvent<HTMLDivElement>)=>{ const el=ref.current; if(!el) return; const r=el.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5; el.style.transform=`perspective(900px) rotateY(${x*5}deg) rotateX(${-y*5}deg) translateZ(4px)`; },[]);
+  const onLeave=useCallback(()=>{ if(ref.current) ref.current.style.transform=""; },[]);
   return <div ref={ref} onMouseMove={onMove} onMouseLeave={onLeave} className={className} style={{transition:"transform 0.12s ease",transformStyle:"preserve-3d"}}>{children}</div>;
 }
 
-/* ══════════════════════════════════════════ Animate helpers */
-function FadeIn({ children, delay=0, className="" }: { children:React.ReactNode; delay?:number; className?:string }) {
-  const ref=useRef(null); const inView=useInView(ref,{once:true,margin:"-70px"});
-  return <motion.div ref={ref} initial={{opacity:0,y:28}} animate={inView?{opacity:1,y:0}:{}} transition={{duration:0.65,delay,ease:[0.22,1,0.36,1]}} className={className}>{children}</motion.div>;
-}
-function SlideIn({ children, delay=0, className="" }: { children:React.ReactNode; delay?:number; className?:string }) {
-  const ref=useRef(null); const inView=useInView(ref,{once:true,margin:"-60px"});
-  return <motion.div ref={ref} initial={{opacity:0,x:-24}} animate={inView?{opacity:1,x:0}:{}} transition={{duration:0.6,delay,ease:[0.22,1,0.36,1]}} className={className}>{children}</motion.div>;
-}
-
-/* ══════════════════════════════════════════ Section Header */
+/* ── Section Header ── */
 function SH({ n, icon:Icon, title, sub }: { n:string; icon:React.ElementType; title:string; sub?:string }) {
   return (
-    <FadeIn className="mb-14">
+    <FadeIn className="mb-12">
       <div className="flex items-start gap-4 mb-4">
-        <span className="sec-num leading-none pt-1">{n}</span>
-        <div>
-          <div className="flex items-center gap-3 mb-1.5">
-            <div className="p-2 rounded-xl bg-indigo-50 border border-indigo-100">
-              <Icon className="w-4 h-4 text-indigo-500" />
-            </div>
+        <span className="sec-num leading-none">{n}</span>
+        <div className="pt-1">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="p-2 rounded-xl bg-indigo-50 border border-indigo-100"><Icon className="w-4 h-4 text-indigo-500"/></div>
             <h2 className="text-4xl font-black tracking-tight text-slate-900">{title}</h2>
           </div>
           {sub && <p className="text-sm text-slate-400 ml-12">{sub}</p>}
         </div>
       </div>
-      <hr className="sdiv" />
+      <hr className="sdiv"/>
     </FadeIn>
   );
 }
 
-/* ══════════════════════════════════════════ Navbar */
-const NAV = [{l:"About",h:"#about"},{l:"Research",h:"#research"},{l:"Experience",h:"#experience"},{l:"Projects",h:"#projects"},{l:"Hackathons",h:"#hackathons"},{l:"Contact",h:"#contact"}];
+/* ── Navbar ── */
+const NAV = [{l:"About",h:"#about"},{l:"Experience",h:"#experience"},{l:"Projects",h:"#projects"},{l:"Contact",h:"#contact"}];
 
 function Navbar() {
   const [scrolled,setScrolled]=useState(false);
@@ -183,241 +114,167 @@ function Navbar() {
   useEffect(()=>{ const f=()=>setScrolled(window.scrollY>50); window.addEventListener("scroll",f); return()=>window.removeEventListener("scroll",f); },[]);
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-      style={{ background: scrolled?"rgba(255,255,255,0.92)":"rgba(255,255,255,0.7)", backdropFilter:"blur(20px)", borderBottom: scrolled?"1px solid #f1f5f9":"1px solid transparent", boxShadow: scrolled?"0 1px 20px rgba(0,0,0,0.05)":"none" }}>
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <a href="#hero" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black text-white"
-            style={{background:"linear-gradient(135deg,#6366f1,#8b5cf6)",boxShadow:"0 2px 12px rgba(99,102,241,0.3)"}}>AV</div>
-          <span className="text-xs font-mono text-slate-400 group-hover:text-slate-600 transition-colors">Data Scientist &amp; ML Engineer</span>
+      style={{ background:scrolled?"rgba(255,255,255,0.94)":"rgba(255,255,255,0.7)", backdropFilter:"blur(20px)", borderBottom:scrolled?"1px solid #f1f5f9":"1px solid transparent", boxShadow:scrolled?"0 1px 20px rgba(0,0,0,0.05)":"none" }}>
+      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <a href="#hero" className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-black text-white" style={{background:"linear-gradient(135deg,#6366f1,#8b5cf6)",boxShadow:"0 2px 10px rgba(99,102,241,0.3)"}}>AV</div>
+          <span className="text-sm font-semibold text-slate-700">Akhilesh Vangala</span>
         </a>
         <div className="hidden md:flex items-center gap-1">
           {NAV.map(({l,h})=>(
             <a key={h} href={h} onMouseEnter={()=>setHov(h)} onMouseLeave={()=>setHov("")}
-              className="relative px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-lg"
+              className="px-4 py-2 text-sm font-medium rounded-lg transition-all"
               style={{color:hov===h?"#6366f1":"#64748b",background:hov===h?"#eef2ff":"transparent"}}>
               {l}
             </a>
           ))}
-          <a href={personalInfo.github} target="_blank" rel="noopener noreferrer"
-            className="ml-3 flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold btn-outline border border-slate-200">
-            <GithubIcon className="w-3.5 h-3.5"/>GitHub
+          <a href="/resume.pdf" download className="ml-3 flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold btn-primary">
+            <Download className="w-3.5 h-3.5"/>Resume
           </a>
         </div>
-        <button onClick={()=>setOpen(!open)} className="md:hidden p-2 text-slate-400 hover:text-slate-700">
-          {open?<X className="w-5 h-5"/>:<Menu className="w-5 h-5"/>}
-        </button>
+        <button onClick={()=>setOpen(!open)} className="md:hidden p-2 text-slate-400">{open?<X className="w-5 h-5"/>:<Menu className="w-5 h-5"/>}</button>
       </div>
       <AnimatePresence>
-        {open&&(
-          <motion.div initial={{opacity:0,height:0}} animate={{opacity:1,height:"auto"}} exit={{opacity:0,height:0}}
-            className="md:hidden overflow-hidden border-t border-slate-100 bg-white">
-            {NAV.map(({l,h})=>(
-              <a key={h} href={h} onClick={()=>setOpen(false)}
-                className="block px-6 py-3.5 text-sm text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors border-b border-slate-50">
-                {l}
-              </a>
-            ))}
-          </motion.div>
-        )}
+        {open&&(<motion.div initial={{opacity:0,height:0}} animate={{opacity:1,height:"auto"}} exit={{opacity:0,height:0}}
+          className="md:hidden overflow-hidden border-t border-slate-100 bg-white">
+          {NAV.map(({l,h})=>(<a key={h} href={h} onClick={()=>setOpen(false)} className="block px-6 py-3.5 text-sm text-slate-500 hover:text-slate-900 hover:bg-slate-50 border-b border-slate-50">{l}</a>))}
+        </motion.div>)}
       </AnimatePresence>
     </nav>
   );
 }
 
-/* ══════════════════════════════════════════ Hero */
+/* ══════════ HERO ══════════ */
 function Hero() {
   return (
-    <section id="hero" className="relative min-h-screen flex flex-col justify-center items-center text-center px-6 overflow-hidden bg-white">
-      <div className="dot-grid absolute inset-0 opacity-60" />
-      {/* Soft gradient blobs */}
+    <section id="hero" className="relative min-h-screen flex flex-col justify-center items-center text-center px-6 bg-white overflow-hidden">
+      <div className="dot-grid absolute inset-0 opacity-50"/>
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute rounded-full" style={{width:700,height:700,top:"-20%",right:"-15%",background:"radial-gradient(circle,rgba(99,102,241,0.07) 0%,transparent 70%)"}}/>
-        <div className="absolute rounded-full" style={{width:600,height:600,bottom:"-15%",left:"-10%",background:"radial-gradient(circle,rgba(168,85,247,0.06) 0%,transparent 70%)"}}/>
+        <div className="absolute rounded-full" style={{width:600,height:600,top:"-20%",right:"-10%",background:"radial-gradient(circle,rgba(99,102,241,0.07),transparent 70%)"}}/>
+        <div className="absolute rounded-full" style={{width:500,height:500,bottom:"-15%",left:"-10%",background:"radial-gradient(circle,rgba(168,85,247,0.06),transparent 70%)"}}/>
       </div>
 
-      <div className="relative z-10 max-w-5xl w-full mx-auto">
-        {/* Status pill */}
-        <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:0.1}}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700">
+      <div className="relative z-10 max-w-3xl w-full mx-auto">
+        {/* Status */}
+        <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:0.05}}
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-8 bg-emerald-50 border border-emerald-200 text-emerald-700">
           <span className="pulse-green"/>
-          Open to Data Science · ML Engineer · Analyst Roles · New York, NY
+          Open to Data Science · ML Engineer · Analyst Roles
         </motion.div>
 
         {/* Name */}
-        <motion.div initial={{opacity:0,y:24}} animate={{opacity:1,y:0}} transition={{delay:0.18,duration:0.7}}>
-          <h1 className="font-black tracking-tighter leading-none text-slate-900 mb-2" style={{fontSize:"clamp(3.5rem,11vw,9rem)"}}>
-            Akhilesh
-          </h1>
-          <h1 className="font-black tracking-tighter leading-none mb-6" style={{fontSize:"clamp(3.5rem,11vw,9rem)"}}>
-            <span className="gt-main">Vangala</span>
-          </h1>
-        </motion.div>
+        <motion.h1 initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} transition={{delay:0.1,duration:0.65}}
+          className="font-black tracking-tighter text-slate-900 mb-3 leading-none"
+          style={{fontSize:"clamp(3rem,9vw,6.5rem)"}}>
+          Akhilesh Vangala
+        </motion.h1>
 
-        {/* Typing */}
-        <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.35}}
-          className="text-xl md:text-2xl font-bold mb-6 h-9 flex items-center justify-center">
-          <TypedRole/>
-        </motion.div>
-
-        {/* Subtitle */}
-        <motion.p initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{delay:0.45}}
-          className="text-slate-500 max-w-xl mx-auto text-base leading-relaxed mb-10">
-          MS Data Science @ <span className="text-slate-800 font-semibold">NYU Courant Institute</span> ·
-          Building ML pipelines, genomic analysis tools, and production AI systems across
-          <span className="text-slate-800 font-semibold"> 2 active research labs</span>.
+        {/* Subtitle line */}
+        <motion.p initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} transition={{delay:0.2}}
+          className="text-lg md:text-xl font-semibold mb-5"
+          style={{color:"#6366f1"}}>
+          Data Scientist &amp; ML Engineer&nbsp;·&nbsp;NYU MS Data Science&nbsp;·&nbsp;GPA 4.0
         </motion.p>
 
-        {/* Stats */}
-        <motion.div initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} transition={{delay:0.55}}
-          className="flex flex-wrap justify-center gap-3 mb-10">
-          {[
-            {val:2,suf:"",label:"Research Labs"},
-            {val:12,suf:"+",label:"ML Projects"},
-            {val:3,suf:"×",label:"Hackathon Runner-Up"},
-            {val:54,suf:"",label:"WGS Samples Analyzed"},
-          ].map(({val,suf,label})=>(
-            <div key={label} className="stat-c flex items-center gap-3">
-              <div>
-                <div className="text-xl font-black gt-main leading-none"><Counter to={val} suffix={suf}/></div>
-                <div className="text-xs text-slate-400 mt-0.5">{label}</div>
-              </div>
-            </div>
-          ))}
-        </motion.div>
+        {/* Body */}
+        <motion.p initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{delay:0.3}}
+          className="text-slate-500 max-w-2xl mx-auto text-base leading-relaxed mb-8">
+          Building predictive models, large-scale data pipelines, and behavioral analytics systems
+          across <span className="text-slate-800 font-semibold">2 active NYU research labs</span>.&nbsp;
+          <span className="text-slate-800 font-semibold">3× hackathon runner-up</span>.
+        </motion.p>
 
-        {/* Floating tech badges */}
-        <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.62}}
+        {/* Static tech badges */}
+        <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.38}}
           className="flex flex-wrap justify-center gap-2 mb-10">
-          {["PyTorch","Transformers","FastAPI","GNN","WGS Pipelines","TensorRT","RAG","MIMIC-III"].map((t,i)=>(
-            <span key={t} className={`chip chip-i ${i%3===0?"float":i%3===1?"float2":"float3"}`}>{t}</span>
+          {["Python","PyTorch","SQL","PySpark","GNN"].map(t=>(
+            <span key={t} className="chip chip-i text-sm font-semibold px-4 py-1.5">{t}</span>
           ))}
         </motion.div>
 
-        {/* CTA */}
-        <motion.div initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} transition={{delay:0.7}}
-          className="flex flex-wrap justify-center gap-3 mb-10">
-          <a href="#contact" className="btn-primary px-8 py-3.5 rounded-full text-sm font-bold flex items-center gap-2">
-            <Send className="w-4 h-4"/>Get In Touch
+        {/* CTAs */}
+        <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:0.45}}
+          className="flex flex-wrap justify-center gap-3">
+          <a href="/resume.pdf" download className="btn-primary flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-bold">
+            <Download className="w-4 h-4"/>Download Resume
           </a>
-          <a href="#projects" className="btn-outline px-8 py-3.5 rounded-full text-sm font-bold flex items-center gap-2 border">
+          <a href="#projects" className="btn-outline flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-bold border border-slate-200">
             View Projects<ArrowUpRight className="w-4 h-4"/>
           </a>
-        </motion.div>
-
-        {/* Socials */}
-        <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.8}}
-          className="flex justify-center gap-2">
-          {[{Icon:LinkedinIcon,href:personalInfo.linkedin,label:"LinkedIn"},{Icon:GithubIcon,href:personalInfo.github,label:"GitHub"},{Icon:Mail,href:`mailto:${personalInfo.email}`,label:"Email"}].map(({Icon,href,label})=>(
-            <a key={label} href={href} target={href.startsWith("http")?"_blank":undefined} rel="noopener noreferrer"
-              className="btn-outline flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium border border-slate-200">
-              <Icon className="w-3.5 h-3.5"/>{label}
-            </a>
-          ))}
+          <a href="#contact" className="btn-outline flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-bold border border-slate-200 text-slate-500">
+            Get In Touch
+          </a>
         </motion.div>
       </div>
 
-      <motion.a href="#about" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:1}}
-        className="absolute bottom-8 flex flex-col items-center gap-1.5 text-slate-300 hover:text-indigo-400 transition-colors">
-        <span className="text-xs font-mono tracking-[0.2em] uppercase">Explore</span>
+      <motion.a href="#about" initial={{opacity:0}} animate={{opacity:1}} transition={{delay:0.9}}
+        className="absolute bottom-8 flex flex-col items-center gap-1 text-slate-300 hover:text-indigo-400 transition-colors">
+        <span className="text-xs font-mono tracking-widest uppercase">Explore</span>
         <ChevronDown className="w-4 h-4 animate-bounce"/>
       </motion.a>
     </section>
   );
 }
 
-/* ══════════════════════════════════════════ About */
+/* ══════════ ABOUT ══════════ */
 function About() {
   return (
     <section id="about" className="relative z-10 py-28 px-6 sec-alt">
-      <div className="max-w-7xl mx-auto">
-        <SH n="01" icon={BookOpen} title="About Me" sub="Graduate researcher, ML engineer, systems builder"/>
-        <div className="grid lg:grid-cols-5 gap-6">
+      <div className="max-w-6xl mx-auto">
+        <SH n="01" icon={BookOpen} title="About Me"/>
+
+        <div className="grid lg:grid-cols-3 gap-6">
           {/* Bio */}
-          <FadeIn delay={0.1} className="lg:col-span-3">
+          <FadeIn delay={0.1} className="lg:col-span-2">
             <TiltCard className="card rounded-2xl p-8 h-full">
-              <h3 className="text-xl font-bold text-slate-900 mb-5 flex items-center gap-3">
-                <span className="w-6 h-0.5 rounded" style={{background:"linear-gradient(90deg,#6366f1,#8b5cf6)"}}/>Who I Am
-              </h3>
-              <div className="space-y-4 text-slate-500 text-sm leading-loose">
-                <p>I&apos;m a <span className="text-slate-800 font-semibold">Data Science MS student at NYU Courant Institute</span>, working at the intersection of ML engineering, genomics, and production AI systems.</p>
-                <p>In the lab, I extend genome-wide IBD survival pipelines using <span className="text-slate-800 font-semibold">Cox PH mixed-effects models</span>, and build strand-aware ribosomal DNA variant detectors analyzing <span className="text-slate-800 font-semibold">54 WGS samples at 5,000x+ depth</span> — resolving a 40× depth-underestimation flaw and increasing calls by <span className="text-slate-800 font-semibold">67×</span>.</p>
-                <p>On the engineering side: fraud detection at <span className="text-slate-800 font-semibold">94% accuracy with sub-50ms latency</span>, ICU forecasting on MIMIC-III, and 96.2% mAP debris classification with TensorRT FP16 at 47 FPS.</p>
-                <p>Three hackathon runner-up finishes in one academic year — Claude Builder, NVIDIA×Dell, and Google at NYU and Columbia.</p>
+              {/* Currently line */}
+              <div className="flex items-start gap-3 mb-6 p-4 rounded-xl bg-indigo-50 border border-indigo-100">
+                <span className="pulse-green mt-1 flex-shrink-0"/>
+                <p className="text-sm text-indigo-800 font-medium leading-relaxed">
+                  <span className="font-bold">Currently:</span> extending HiFiMAP for survival analysis at NYU + building rDNA variant pipelines for schizophrenia research.
+                </p>
               </div>
-              <div className="grid grid-cols-3 gap-3 mt-8">
-                {[{v:"67×",s:"more variant calls"},{v:"254K",s:"SNPs scanned"},{v:"528K+",s:"variants detected"}].map(({v,s})=>(
-                  <div key={s} className="text-center py-4 rounded-xl bg-indigo-50 border border-indigo-100">
-                    <div className="text-2xl font-black gt-main">{v}</div>
-                    <div className="text-xs text-slate-400 mt-1">{s}</div>
-                  </div>
-                ))}
+              <div className="space-y-4 text-slate-500 text-sm leading-loose">
+                <p>I&apos;m a Data Science MS student at <span className="text-slate-800 font-semibold">NYU Courant Institute</span>, working at the intersection of ML engineering, genomics, and applied AI. I run two active research threads: extending genome-wide IBD survival mapping with Cox PH mixed-effects models, and building strand-aware ribosomal DNA variant detectors on 54 WGS samples at 5,000x+ depth — resolving a 40× underestimation flaw and increasing variant calls <span className="text-slate-800 font-semibold">67×</span>.</p>
+                <p>On the engineering side, I build systems end-to-end. Fraud detection at <span className="text-slate-800 font-semibold">94% accuracy with sub-50ms latency</span> over 500K+ daily transactions. ICU vital sign forecasting on <span className="text-slate-800 font-semibold">MIMIC-III</span> with temporal SHAP interpretability. <span className="text-slate-800 font-semibold">96.2% mAP</span> debris classification deployed with TensorRT FP16 at 47 FPS. Every system I build is fast, explainable, and reproducible.</p>
+                <p>Three hackathon runner-up finishes in a single academic year at NYU and Columbia. The common thread: prototyping fast, iterating on evidence, and shipping something that works under pressure.</p>
               </div>
             </TiltCard>
           </FadeIn>
 
-          <div className="lg:col-span-2 space-y-5">
-            <FadeIn delay={0.2}>
-              <div className="card rounded-2xl p-6">
-                <p className="text-xs font-bold uppercase tracking-widest text-indigo-500 mb-4">Core Proficiencies</p>
-                <div className="space-y-3.5">
-                  {skills.map((s,i)=>(
-                    <div key={s.name}>
-                      <div className="flex justify-between text-xs mb-1.5">
-                        <span className="text-slate-600 font-medium">{s.name}</span>
-                        <span className="font-mono text-indigo-500">{s.level}%</span>
-                      </div>
-                      <div className="sbar-track">
-                        <motion.div className="sbar-fill" initial={{width:0}} whileInView={{width:`${s.level}%`}} viewport={{once:true}} transition={{duration:1.1,delay:i*0.07,ease:"easeOut"}}/>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+          {/* Education */}
+          <FadeIn delay={0.2}>
+            <div className="card rounded-2xl overflow-hidden h-full flex flex-col">
+              <div className="flex items-center gap-2 px-6 pt-5 pb-3 border-b border-slate-100">
+                <GraduationCap className="w-4 h-4 text-indigo-500"/>
+                <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Education</h3>
               </div>
-            </FadeIn>
-
-            <FadeIn delay={0.3}>
-              <div className="card rounded-2xl p-6">
-                <p className="text-xs font-bold uppercase tracking-widest text-indigo-500 mb-4">Identities</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {coreValues.map((cv)=>(
-                    <div key={cv.title} className="p-3 rounded-xl bg-slate-50 border border-slate-100 hover:bg-indigo-50 hover:border-indigo-100 transition-all cursor-default">
-                      <div className="text-xs font-bold text-slate-800">{cv.title}</div>
-                      <div className="text-xs text-slate-400 mt-0.5">{cv.sub}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </FadeIn>
-          </div>
-        </div>
-
-        {/* Tech stack */}
-        <FadeIn delay={0.15} className="mt-6">
-          <div className="card rounded-2xl p-6">
-            <p className="text-xs font-bold uppercase tracking-widest text-indigo-500 mb-4">Full Technology Stack</p>
-            <div className="flex flex-wrap gap-2">
-              {skillTags.map(t=><span key={t} className="chip chip-i">{t}</span>)}
-            </div>
-          </div>
-        </FadeIn>
-
-        {/* Education */}
-        <FadeIn delay={0.2} className="mt-6">
-          <div className="card rounded-2xl overflow-hidden">
-            <div className="flex items-center gap-3 px-8 pt-6 pb-4 border-b border-slate-100">
-              <GraduationCap className="w-5 h-5 text-indigo-500"/>
-              <h3 className="text-lg font-bold text-slate-900">Education</h3>
-            </div>
-            <div className="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100">
               {education.map((e,i)=>(
-                <div key={e.institution} className="p-8">
-                  <div className="flex items-center gap-2 mb-3">
+                <div key={e.institution} className={`p-6 flex-1 ${i===0?"border-b border-slate-100":""}`}>
+                  <div className="flex items-center gap-2 mb-2">
                     <div className="w-2 h-2 rounded-full" style={{background:i===0?"#6366f1":"#8b5cf6"}}/>
                     <span className="text-xs font-mono text-slate-400">{e.period}</span>
                   </div>
-                  <div className="font-bold text-slate-900 mb-0.5">{e.degree}</div>
-                  <div className="text-sm text-slate-500 mb-3">{e.institution}</div>
+                  <div className="font-bold text-slate-900 text-sm leading-snug mb-0.5">{e.degree}</div>
+                  <div className="text-xs text-slate-500 mb-2">{e.institution}</div>
                   <div className="text-xs text-slate-400 leading-relaxed">{e.courses}</div>
+                </div>
+              ))}
+            </div>
+          </FadeIn>
+        </div>
+
+        {/* Skills grid */}
+        <FadeIn delay={0.2} className="mt-6">
+          <div className="card rounded-2xl p-6">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-indigo-500 mb-5">Technical Skills</h3>
+            <div className="grid grid-cols-3 gap-6">
+              {skillColumns.map(col=>(
+                <div key={col.label}>
+                  <div className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-3">{col.label}</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {col.items.map(item=><span key={item} className="chip chip-i">{item}</span>)}
+                  </div>
                 </div>
               ))}
             </div>
@@ -428,79 +285,47 @@ function About() {
   );
 }
 
-/* ══════════════════════════════════════════ Research */
-function Research() {
+/* ══════════ RESEARCH & EXPERIENCE ══════════ */
+function Experience() {
   return (
-    <section id="research" className="relative z-10 py-28 px-6 bg-white">
-      <div className="max-w-7xl mx-auto">
-        <SH n="02" icon={FlaskConical} title="Research Experience" sub="Active in 2 labs — genomics, bioinformatics, statistical modeling"/>
+    <section id="experience" className="relative z-10 py-28 px-6 bg-white">
+      <div className="max-w-6xl mx-auto">
+        <SH n="02" icon={Briefcase} title="Research & Experience" sub="2 active NYU research roles · Software engineering"/>
+
         <div className="relative pl-12 space-y-6">
           <div className="tl-line"/>
-          {research.map((r,i)=>(
-            <SlideIn key={r.lab} delay={i*0.12} className="relative">
-              <div className="absolute -left-12 top-7 dot-i" style={{transform:"translateX(14px)"}}/>
+          {allExperience.map((e,i)=>(
+            <SlideIn key={e.org+e.role} delay={i*0.1} className="relative">
+              <div className="absolute -left-12 top-7" style={{transform:"translateX(14px)"}}>
+                {e.type==="research" ? <div className="dot-i"/> : <div className="dot-v"/>}
+              </div>
               <TiltCard className="card rounded-2xl p-8 group">
                 <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
                   <div>
-                    <span className="inline-flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 mb-2">
-                      <span className="pulse-green"/>ACTIVE · {r.period}
-                    </span>
-                    <h3 className="text-xl font-black text-slate-900 mt-1 group-hover:text-indigo-600 transition-colors">{r.role}</h3>
-                    <div className="text-slate-500 font-medium mt-0.5">{r.lab}</div>
-                    <div className="text-sm italic text-slate-400 mt-0.5">{r.advisor}</div>
-                  </div>
-                  <span className="text-xs text-slate-400 flex items-center gap-1.5"><MapPin className="w-3 h-3"/>{r.location}</span>
-                </div>
-                <ul className="space-y-3 mb-5">
-                  {r.bullets.map((b,j)=>(
-                    <li key={j} className="flex gap-3 text-sm text-slate-500 leading-relaxed">
-                      <span className="mt-2 dot-i flex-shrink-0" style={{width:6,height:6,minWidth:6,boxShadow:"none",background:"#6366f1"}}/>
-                      {b}
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex flex-wrap gap-1.5">
-                  {r.tags.map(t=><span key={t} className="chip chip-i">{t}</span>)}
-                </div>
-              </TiltCard>
-            </SlideIn>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ══════════════════════════════════════════ Experience */
-function Experience() {
-  return (
-    <section id="experience" className="relative z-10 py-28 px-6 sec-alt">
-      <div className="max-w-7xl mx-auto">
-        <SH n="03" icon={Briefcase} title="Work Experience" sub="Software engineering and applied AI roles"/>
-        <div className="relative pl-12 space-y-6">
-          <div className="tl-line" style={{background:"linear-gradient(to bottom,transparent,#ddd6fe 20%,#ddd6fe 80%,transparent)"}}/>
-          {experience.map((e,i)=>(
-            <SlideIn key={e.company} delay={i*0.12} className="relative">
-              <div className="absolute -left-12 top-7 dot-v" style={{transform:"translateX(14px)"}}/>
-              <TiltCard className="card rounded-2xl p-8 group">
-                <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
-                  <div>
-                    <div className="text-xs font-mono text-violet-500 mb-1">{e.period}</div>
-                    <h3 className="text-xl font-black text-slate-900 group-hover:text-violet-600 transition-colors">{e.role}</h3>
-                    <div className="text-slate-500 font-medium mt-0.5">{e.company}</div>
-                    <div className="text-xs text-slate-400 mt-0.5">{e.location}</div>
+                    {e.type==="research"&&(
+                      <span className="inline-flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 mb-2">
+                        <span className="pulse-green"/>ACTIVE · {e.period}
+                      </span>
+                    )}
+                    {e.type==="work"&&(
+                      <div className="text-xs font-mono text-violet-500 mb-1">{e.period}</div>
+                    )}
+                    <h3 className={`text-xl font-black text-slate-900 mt-1 group-hover:${e.type==="research"?"text-indigo-600":"text-violet-600"} transition-colors`}>{e.role}</h3>
+                    <div className="text-slate-500 font-medium">{e.org}</div>
+                    {e.advisor&&<div className="text-sm italic text-slate-400">{e.advisor}</div>}
+                    <div className="text-xs text-slate-400 mt-0.5 flex items-center gap-1"><MapPin className="w-3 h-3"/>{e.location}</div>
                   </div>
                 </div>
-                <ul className="space-y-2.5 mb-4">
+                <ul className="space-y-2.5 mb-5">
                   {e.bullets.map((b,j)=>(
                     <li key={j} className="flex gap-3 text-sm text-slate-500 leading-relaxed">
-                      <span className="mt-2 w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0"/>
+                      <span className="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{background:e.type==="research"?"#6366f1":"#8b5cf6"}}/>
                       {b}
                     </li>
                   ))}
                 </ul>
                 <div className="flex flex-wrap gap-1.5">
-                  {e.tags.map(t=><span key={t} className="chip chip-v">{t}</span>)}
+                  {e.tags.map(t=><span key={t} className={`chip ${e.type==="research"?"chip-i":"chip-v"}`}>{t}</span>)}
                 </div>
               </TiltCard>
             </SlideIn>
@@ -511,31 +336,48 @@ function Experience() {
   );
 }
 
-/* ══════════════════════════════════════════ Projects */
+/* ══════════ PROJECTS ══════════ */
 function Projects() {
   return (
-    <section id="projects" className="relative z-10 py-28 px-6 bg-white">
-      <div className="max-w-7xl mx-auto">
-        <SH n="04" icon={Code} title="Projects" sub="Production ML systems, research pipelines, deployed applications"/>
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {projects.map((p,i)=>(
-            <FadeIn key={p.title} delay={(i%3)*0.08}>
+    <section id="projects" className="relative z-10 py-28 px-6 sec-alt">
+      <div className="max-w-6xl mx-auto">
+        <SH n="03" icon={Code} title="Projects" sub="Problem → result → how — the only format that matters"/>
+
+        {/* 4 featured */}
+        <div className="grid md:grid-cols-2 gap-5 mb-10">
+          {featuredProjects.map((p,i)=>(
+            <FadeIn key={p.title} delay={(i%2)*0.08}>
               <TiltCard className="card rounded-2xl overflow-hidden flex flex-col h-full group">
-                <div className="ptop"/>
-                <div className="p-6 flex flex-col h-full">
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <h3 className="text-sm font-bold text-slate-900 leading-snug group-hover:text-indigo-600 transition-colors">{p.title}</h3>
-                    <a href={p.github} target="_blank" rel="noopener noreferrer"
-                      className="flex-shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all">
-                      <ArrowUpRight className="w-4 h-4"/>
-                    </a>
-                  </div>
-                  <p className="text-slate-400 text-xs leading-relaxed flex-1 mb-4">{p.description}</p>
-                  {p.metrics.length>0&&(
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      {p.metrics.map(m=><span key={m} className="badge-g">{m}</span>)}
+                <div className="h-0.5 w-full" style={{background:"linear-gradient(90deg,#6366f1,#8b5cf6,#a855f7)"}}/>
+                <div className="p-7 flex flex-col h-full">
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <h3 className="text-base font-black text-slate-900 leading-snug group-hover:text-indigo-600 transition-colors">{p.title}</h3>
+                    <div className="flex gap-1 flex-shrink-0">
+                      {p.demo&&<a href={p.demo} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-500 transition-colors" title="Live Demo"><ExternalLink className="w-3.5 h-3.5"/></a>}
+                      <a href={p.github} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"><ArrowUpRight className="w-3.5 h-3.5"/></a>
                     </div>
-                  )}
+                  </div>
+
+                  {/* Problem / Result / How */}
+                  <div className="space-y-3 flex-1 mb-4 text-sm">
+                    <div className="flex gap-3">
+                      <span className="flex-shrink-0 text-xs font-bold uppercase tracking-wider text-slate-400 w-14 pt-0.5">Problem</span>
+                      <span className="text-slate-600 leading-relaxed">{p.problem}</span>
+                    </div>
+                    <div className="flex gap-3">
+                      <span className="flex-shrink-0 text-xs font-bold uppercase tracking-wider text-emerald-500 w-14 pt-0.5">Result</span>
+                      <span className="text-slate-700 font-medium leading-relaxed">{p.result}</span>
+                    </div>
+                    <div className="flex gap-3">
+                      <span className="flex-shrink-0 text-xs font-bold uppercase tracking-wider text-indigo-400 w-14 pt-0.5">How</span>
+                      <span className="text-slate-500 leading-relaxed">{p.how}</span>
+                    </div>
+                  </div>
+
+                  {/* Metrics */}
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {p.metrics.map(m=><span key={m} className="badge-g">{m}</span>)}
+                  </div>
                   <div className="flex flex-wrap gap-1.5">
                     {p.tags.map(t=><span key={t} className="chip chip-i">{t}</span>)}
                   </div>
@@ -544,123 +386,122 @@ function Projects() {
             </FadeIn>
           ))}
         </div>
-        <FadeIn delay={0.2} className="mt-10 text-center">
-          <a href={personalInfo.github} target="_blank" rel="noopener noreferrer"
-            className="btn-outline inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold border border-slate-200">
-            <GithubIcon className="w-4 h-4"/>View All on GitHub<ExternalLink className="w-3.5 h-3.5"/>
-          </a>
+
+        {/* More on GitHub row */}
+        <FadeIn delay={0.1} className="mb-14">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-sm font-bold text-slate-500">More on GitHub</span>
+            <div className="flex-1 h-px bg-slate-100"/>
+            <a href={personalInfo.github} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs font-semibold text-indigo-500 hover:text-indigo-700 transition-colors">
+              View all repos<ArrowUpRight className="w-3.5 h-3.5"/>
+            </a>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {moreProjects.map(p=>(
+              <a key={p.title} href={p.github} target="_blank" rel="noopener noreferrer"
+                className="card rounded-xl p-4 hover:border-indigo-200 transition-all group flex flex-col gap-1">
+                <span className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors leading-snug">{p.title}</span>
+                <span className="text-xs text-slate-400 leading-snug">{p.sub}</span>
+                <ArrowUpRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-indigo-400 mt-1 transition-colors"/>
+              </a>
+            ))}
+          </div>
+        </FadeIn>
+
+        {/* Hackathon badges — subsection */}
+        <FadeIn delay={0.1}>
+          <div className="flex items-center gap-3 mb-5">
+            <Trophy className="w-4 h-4 text-amber-500"/>
+            <span className="text-sm font-bold text-slate-500">Hackathons — 3× Runner-Up</span>
+            <div className="flex-1 h-px bg-slate-100"/>
+          </div>
+          <div className="grid md:grid-cols-3 gap-3">
+            {hackathonBadges.map(h=>(
+              <div key={h.name} className="card-flat rounded-xl p-5 flex items-start gap-3">
+                <div className="flex-shrink-0 mt-0.5">
+                  <span className="chip chip-a font-bold">🥈 Runner-Up</span>
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-slate-800">{h.project}</div>
+                  <div className="text-xs font-semibold text-amber-600 mt-0.5">{h.name}</div>
+                  <div className="text-xs text-slate-400 mt-0.5">{h.org}</div>
+                  <div className="text-xs text-slate-500 mt-1.5 leading-relaxed">{h.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
         </FadeIn>
       </div>
     </section>
   );
 }
 
-/* ══════════════════════════════════════════ Hackathons */
-function Hackathons() {
-  return (
-    <section id="hackathons" className="relative z-10 py-28 px-6 sec-alt">
-      <div className="max-w-7xl mx-auto">
-        <SH n="05" icon={Trophy} title="Hackathons" sub="3 consecutive runner-up finishes at NYU and Columbia"/>
-        <div className="grid md:grid-cols-3 gap-5">
-          {hackathons.map((h,i)=>(
-            <FadeIn key={h.name} delay={i*0.1}>
-              <TiltCard className="card rounded-2xl p-6 h-full flex flex-col group">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="chip chip-a flex items-center gap-1.5 text-xs font-black py-1.5 px-3">
-                    <Trophy className="w-3 h-3"/>{h.result}
-                  </span>
-                  <a href={h.github} target="_blank" rel="noopener noreferrer">
-                    <GithubIcon className="w-4 h-4 text-slate-300 hover:text-slate-700 transition-colors"/>
-                  </a>
-                </div>
-                <div className="text-xs font-mono text-slate-400 mb-1">{h.organizer}</div>
-                <h3 className="font-black text-slate-900 text-base mb-1 group-hover:text-amber-600 transition-colors">{h.name}</h3>
-                <div className="text-sm font-bold text-amber-500 mb-3">{h.project}</div>
-                <p className="text-slate-400 text-xs leading-relaxed flex-1 mb-4">{h.description}</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {h.tags.map(t=><span key={t} className="chip chip-a">{t}</span>)}
-                </div>
-              </TiltCard>
-            </FadeIn>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ══════════════════════════════════════════ Contact */
+/* ══════════ CONTACT ══════════ */
 function Contact() {
   return (
     <section id="contact" className="relative z-10 py-28 px-6 bg-white">
-      <div className="max-w-5xl mx-auto">
-        <SH n="06" icon={Send} title="Get In Touch" sub="Research collabs, ML engineering roles, interesting problems"/>
-        <div className="grid md:grid-cols-2 gap-6">
-          <FadeIn delay={0.1}>
-            <TiltCard className="card rounded-2xl p-8 h-full flex flex-col">
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Let&apos;s build something exceptional</h3>
-              <p className="text-slate-400 text-sm leading-relaxed mb-8">Open to research collaborations, ML engineering challenges, and conversations about data science. Reach out anytime.</p>
-              <div className="space-y-3 flex-1">
-                {[
-                  {Icon:Mail,label:personalInfo.email,href:`mailto:${personalInfo.email}`,bg:"bg-indigo-50",color:"text-indigo-500"},
-                  {Icon:Phone,label:personalInfo.phone,href:`tel:${personalInfo.phone}`,bg:"bg-violet-50",color:"text-violet-500"},
-                  {Icon:MapPin,label:personalInfo.location,href:"#",bg:"bg-emerald-50",color:"text-emerald-500"},
-                ].map(({Icon,label,href,bg,color})=>(
-                  <a key={label} href={href} className="flex items-center gap-4 p-4 rounded-xl border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50 transition-all group">
-                    <div className={`p-2 rounded-lg ${bg}`}><Icon className={`w-4 h-4 ${color}`}/></div>
-                    <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">{label}</span>
-                  </a>
-                ))}
+      <div className="max-w-3xl mx-auto text-center">
+        <SH n="04" icon={Mail} title="Get In Touch"/>
+
+        <FadeIn delay={0.1}>
+          <p className="text-slate-500 text-base leading-relaxed mb-12 max-w-xl mx-auto">
+            Open to research collaborations, data science and ML engineering roles, and interesting conversations.
+          </p>
+
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <a href={`mailto:${personalInfo.email}`}
+              className="flex items-center justify-center gap-3 px-8 py-5 rounded-2xl card hover:border-indigo-200 group transition-all">
+              <div className="p-2.5 rounded-xl bg-indigo-50 group-hover:bg-indigo-100 transition-colors">
+                <Mail className="w-5 h-5 text-indigo-500"/>
               </div>
-              <div className="flex gap-2 mt-6">
-                <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer"
-                  className="btn-outline flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold border border-slate-200">
-                  <LinkedinIcon className="w-4 h-4"/>LinkedIn
-                </a>
-                <a href={personalInfo.github} target="_blank" rel="noopener noreferrer"
-                  className="btn-outline flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold border border-slate-200">
-                  <GithubIcon className="w-4 h-4"/>GitHub
-                </a>
+              <div className="text-left">
+                <div className="text-xs text-slate-400 font-medium">Email</div>
+                <div className="text-sm font-bold text-slate-800">{personalInfo.email}</div>
               </div>
-            </TiltCard>
-          </FadeIn>
-          <FadeIn delay={0.2}>
-            <form onSubmit={e=>{e.preventDefault();window.location.href=`mailto:${personalInfo.email}`;}} className="card rounded-2xl p-8 space-y-5">
-              {[{l:"Name",t:"text",p:"Your name"},{l:"Email",t:"email",p:"your@email.com"}].map(({l,t,p})=>(
-                <div key={l}>
-                  <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">{l}</label>
-                  <input type={t} placeholder={p} className="inp"/>
-                </div>
-              ))}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Message</label>
-                <textarea rows={5} placeholder="What would you like to discuss?" className="inp" style={{resize:"none"}}/>
+            </a>
+
+            <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer"
+              className="flex items-center justify-center gap-3 px-8 py-5 rounded-2xl card hover:border-blue-200 group transition-all">
+              <div className="p-2.5 rounded-xl bg-blue-50 group-hover:bg-blue-100 transition-colors">
+                <LinkedinIcon className="w-5 h-5 text-blue-600"/>
               </div>
-              <button type="submit" className="btn-primary w-full py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2">
-                <Send className="w-4 h-4"/>Send Message
-              </button>
-            </form>
-          </FadeIn>
-        </div>
+              <div className="text-left">
+                <div className="text-xs text-slate-400 font-medium">LinkedIn</div>
+                <div className="text-sm font-bold text-slate-800">akhilesh-nyu</div>
+              </div>
+            </a>
+
+            <a href={personalInfo.github} target="_blank" rel="noopener noreferrer"
+              className="flex items-center justify-center gap-3 px-8 py-5 rounded-2xl card hover:border-slate-300 group transition-all">
+              <div className="p-2.5 rounded-xl bg-slate-100 group-hover:bg-slate-200 transition-colors">
+                <GithubIcon className="w-5 h-5 text-slate-700"/>
+              </div>
+              <div className="text-left">
+                <div className="text-xs text-slate-400 font-medium">GitHub</div>
+                <div className="text-sm font-bold text-slate-800">Akhilesh-Vangala</div>
+              </div>
+            </a>
+          </div>
+        </FadeIn>
       </div>
     </section>
   );
 }
 
-/* ══════════════════════════════════════════ Footer */
+/* ══════════ FOOTER ══════════ */
 function Footer() {
   return (
-    <footer className="relative z-10 py-10 px-6 border-t border-slate-100 bg-white">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-6 h-6 rounded flex items-center justify-center text-xs font-black text-white" style={{background:"linear-gradient(135deg,#6366f1,#8b5cf6)"}}>AV</div>
-          <span className="text-xs text-slate-400 font-mono">Akhilesh Vangala · NYU Courant · Data Science</span>
+    <footer className="relative z-10 py-8 px-6 border-t border-slate-100 bg-white">
+      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded text-xs font-black text-white flex items-center justify-center" style={{background:"linear-gradient(135deg,#6366f1,#8b5cf6)"}}>AV</div>
+          <span className="text-xs text-slate-400 font-mono">Akhilesh Vangala · NYU Courant</span>
         </div>
-        <p className="text-slate-300 text-xs">© {new Date().getFullYear()} · Built with Next.js, Tailwind &amp; Framer Motion</p>
+        <p className="text-slate-300 text-xs">© {new Date().getFullYear()} · Next.js · Tailwind · Framer Motion</p>
         <div className="flex gap-3">
-          {[{Icon:LinkedinIcon,href:personalInfo.linkedin},{Icon:GithubIcon,href:personalInfo.github},{Icon:Mail,href:`mailto:${personalInfo.email}`}].map(({Icon,href},i)=>(
-            <a key={i} href={href} target={href.startsWith("http")?"_blank":undefined} rel="noopener noreferrer"
-              className="text-slate-300 hover:text-indigo-500 transition-colors"><Icon className="w-4 h-4"/></a>
+          {[{I:LinkedinIcon,h:personalInfo.linkedin},{I:GithubIcon,h:personalInfo.github},{I:Mail,h:`mailto:${personalInfo.email}`}].map(({I,h},i)=>(
+            <a key={i} href={h} target={h.startsWith("http")?"_blank":undefined} rel="noopener noreferrer" className="text-slate-300 hover:text-indigo-500 transition-colors"><I className="w-4 h-4"/></a>
           ))}
         </div>
       </div>
@@ -668,21 +509,18 @@ function Footer() {
   );
 }
 
-/* ══════════════════════════════════════════ Page */
+/* ══════════ PAGE ══════════ */
 export default function Home() {
   return (
     <>
       <ScrollProgress/>
       <NeuralBackground/>
-      <MouseSpotlight/>
       <Navbar/>
       <main>
         <Hero/>
         <About/>
-        <Research/>
         <Experience/>
         <Projects/>
-        <Hackathons/>
         <Contact/>
       </main>
       <Footer/>
