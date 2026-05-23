@@ -261,7 +261,7 @@ function About() {
               <div className="flex items-start gap-3 mb-6 p-4 rounded-xl border" style={{ background: "linear-gradient(135deg,#eef2ff,#f5f3ff)", borderColor: "#c7d2fe" }}>
                 <span className="pulse-green mt-1 flex-shrink-0" />
                 <p className="text-sm font-medium leading-relaxed" style={{ color: "#3730a3" }}>
-                  <span className="font-black">Currently:</span> extending HiFiMAP for survival analysis at NYU + building rDNA variant pipelines for schizophrenia research.
+                  <span className="font-black">Currently:</span> Extending HiFiMAP for survival analysis at NYU + building rDNA variant pipelines for schizophrenia research.
                 </p>
               </div>
               {/* Decorative graphic accent */}
@@ -334,7 +334,7 @@ function Experience() {
   return (
     <section id="experience" className="relative z-10 py-28 px-6" style={{ background: "#f1f5f9" }}>
       <div className="max-w-6xl mx-auto">
-        <SH icon={Briefcase} title="Research & Experience" sub="2 active NYU labs · Software engineering" />
+        <SH icon={Briefcase} title="Research & Experience" sub="2 active NYU labs · Software engineering internship" />
 
         <div className="relative pl-12 space-y-6">
           <div className="tl-line" />
@@ -456,7 +456,7 @@ function Projects() {
   return (
     <section id="projects" className="relative z-10 py-28 px-6 sec-alt">
       <div className="max-w-6xl mx-auto">
-        <SH icon={Code} title="Projects" sub="Problem → Result → How across 8 projects" />
+        <SH icon={Code} title="Projects" sub="All 8 projects — impact first, then how" />
 
         {/* Featured 4 — larger grid */}
         <div className="mb-5">
