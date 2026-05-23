@@ -209,9 +209,9 @@ export const projects = [
   {
     title: "SmartRent Manhattan",
     description:
-      "End-to-end Manhattan rental price prediction over 3,539 listings. XGBoost selected over Random Forest and Linear Regression with RMSE 8.34 and R² 0.9999 across 49 engineered features.",
+      "End-to-end Manhattan rental price prediction over 3,539 listings. XGBoost selected over Random Forest and Linear Regression with RMSE 8.34 and R² 0.92 across 49 engineered features.",
     tags: ["XGBoost", "Feature Engineering", "Streamlit", "Python", "Regression"],
     github: "https://github.com/Akhilesh-Vangala",
-    metrics: ["R² 0.9999", "RMSE 8.34", "~$8 avg error"],
+    metrics: ["R² 0.92", "RMSE 8.34", "~$8 avg error"],
   },
 ];

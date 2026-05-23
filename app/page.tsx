@@ -311,7 +311,7 @@ function Hero() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-6"
           style={{ background: "rgba(74,222,128,0.07)", border: "1px solid rgba(74,222,128,0.18)", color: "#86efac" }}>
           <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-          Open to Research Collabs &amp; ML Roles · New York, NY
+          Open to Data Science · ML Engineer · Analyst Roles · New York, NY
         </motion.div>
 
         {/* Name */}
@@ -335,7 +335,7 @@ function Hero() {
         {/* Subtitle */}
         <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
           className="text-gray-500 max-w-xl mx-auto text-base leading-relaxed mb-10">
-          MS Data Science @ <span className="text-gray-300 font-semibold">NYU Courant</span> · GPA 4.0 ·
+          MS Data Science @ <span className="text-gray-300 font-semibold">NYU Courant</span> ·
           Building ML pipelines, genomic analysis tools, and production AI systems across
           <span className="text-gray-300 font-semibold"> 2 active research labs</span>.
         </motion.p>
@@ -344,10 +344,10 @@ function Hero() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}
           className="flex flex-wrap justify-center gap-3 mb-10">
           {[
-            { val: 40, suf: "", label: "GPA", display: "4.0" },
             { val: 2, suf: "", label: "Research Labs", display: null },
             { val: 12, suf: "+", label: "ML Projects", display: null },
             { val: 3, suf: "×", label: "Hackathon Runner-Up", display: null },
+            { val: 54, suf: "", label: "WGS Samples Analyzed", display: null },
           ].map(({ val, suf, label, display }) => (
             <div key={label} className="stat-c flex items-center gap-3">
               <div className="text-left">
@@ -423,7 +423,7 @@ function About() {
               <div className="space-y-4 text-gray-400 text-sm leading-loose">
                 <p>
                   I&apos;m a <span className="text-white font-semibold">Data Science MS student at NYU Courant Institute</span> with
-                  a perfect 4.0 GPA, working at the intersection of machine learning engineering, genomics, and applied AI.
+                  working at the intersection of machine learning engineering, genomics, and applied AI.
                 </p>
                 <p>
                   In the lab, I&apos;m extending genome-wide IBD survival pipelines with <span className="text-white font-semibold">Cox PH mixed-effects models</span> at
@@ -443,7 +443,7 @@ function About() {
               {/* Mini stats */}
               <div className="grid grid-cols-3 gap-3 mt-8">
                 {[
-                  { v: "4.0", s: "GPA" }, { v: "67×", s: "more calls" }, { v: "254K", s: "SNPs scanned" }
+                  { v: "67×", s: "more calls" }, { v: "254K", s: "SNPs scanned" }, { v: "528K+", s: "variants detected" }
                 ].map(({ v, s }) => (
                   <div key={s} className="text-center py-4 rounded-xl"
                     style={{ background: "rgba(99,102,241,0.05)", border: "1px solid rgba(99,102,241,0.1)" }}>
@@ -523,7 +523,7 @@ function About() {
                   <div className="text-xs font-mono mb-1" style={{ color: i === 0 ? "#818cf8" : "#c4b5fd" }}>{e.period}</div>
                   <div className="font-bold text-white text-sm">{e.degree}</div>
                   <div className="text-sm text-gray-500 mt-0.5">{e.institution}</div>
-                  <div className="text-sm font-bold mt-1.5" style={{ color: i === 0 ? "#4ade80" : "#a78bfa" }}>GPA: {e.gpa}</div>
+                  <div className="text-sm font-bold mt-1.5" style={{ color: i === 0 ? "#4ade80" : "#a78bfa" }}></div>
                   <div className="text-xs text-gray-700 mt-2 leading-relaxed">{e.courses}</div>
                 </div>
               ))}
