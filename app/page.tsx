@@ -36,21 +36,24 @@ function ScrollProgress() {
   return <motion.div className="scroll-prog" style={{ scaleX, transformOrigin: "left" }} />;
 }
 
-/* ─── Animated Counter ─── */
+/* ─── Animated Counter — starts at 80% of target ─── */
 function Counter({ target, suffix }: { target: number; suffix: string }) {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(Math.floor(target * 0.8));
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
   useEffect(() => {
     if (!inView) return;
-    let start = 0;
-    const step = target / 60;
+    // Fallback: show final value immediately if animation is slow to trigger
+    const fallback = setTimeout(() => setCount(target), 400);
+    const start = Math.floor(target * 0.8);
+    let cur = start;
+    const step = Math.max(1, Math.ceil((target - start) / 40));
     const timer = setInterval(() => {
-      start += step;
-      if (start >= target) { setCount(target); clearInterval(timer); }
-      else setCount(Math.floor(start));
-    }, 18);
-    return () => clearInterval(timer);
+      cur += step;
+      if (cur >= target) { setCount(target); clearInterval(timer); clearTimeout(fallback); }
+      else setCount(cur);
+    }, 22);
+    return () => { clearInterval(timer); clearTimeout(fallback); };
   }, [inView, target]);
   return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
 }
@@ -114,17 +117,14 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
 }
 
 /* ─── Section Header ─── */
-function SH({ n, icon: Icon, title, sub }: { n: string; icon: React.ElementType; title: string; sub?: string }) {
+function SH({ icon: Icon, title, sub }: { icon: React.ElementType; title: string; sub?: string }) {
   return (
     <FadeIn className="mb-12">
-      <div className="flex items-start gap-4 mb-4">
-        <span className="sec-num leading-none">{n}</span>
-        <div className="pt-1">
-          <div className="flex items-center gap-3 mb-1">
-            <div className="p-2 rounded-xl bg-indigo-50 border border-indigo-100"><Icon className="w-4 h-4 text-indigo-500" /></div>
-            <h2 className="text-4xl font-black tracking-tight text-slate-900">{title}</h2>
-          </div>
-          {sub && <p className="text-sm text-slate-400 ml-12">{sub}</p>}
+      <div className="flex items-center gap-3 mb-4">
+        <div className="p-2 rounded-xl bg-indigo-50 border border-indigo-100"><Icon className="w-4 h-4 text-indigo-500" /></div>
+        <div>
+          <h2 className="text-4xl font-black tracking-tight text-slate-900">{title}</h2>
+          {sub && <p className="text-sm text-slate-400 mt-0.5">{sub}</p>}
         </div>
       </div>
       <hr className="sdiv" />
@@ -235,16 +235,6 @@ function Hero() {
           </a>
         </motion.div>
 
-        {/* Stat counters */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl mx-auto">
-          {heroStats.map((s, i) => (
-            <div key={i} className="stat-card">
-              <div className="glow-num mb-0.5"><Counter target={s.value} suffix={s.suffix} /></div>
-              <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{s.label}</div>
-            </div>
-          ))}
-        </motion.div>
       </div>
 
       <motion.a href="#about" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
@@ -261,7 +251,7 @@ function About() {
   return (
     <section id="about" className="relative z-10 py-28 px-6 sec-alt">
       <div className="max-w-6xl mx-auto">
-        <SH n="01" icon={BookOpen} title="About Me" />
+        <SH icon={BookOpen} title="About Me" />
 
         <div className="grid lg:grid-cols-3 gap-5">
           {/* Bio card */}
@@ -344,7 +334,7 @@ function Experience() {
   return (
     <section id="experience" className="relative z-10 py-28 px-6" style={{ background: "#f1f5f9" }}>
       <div className="max-w-6xl mx-auto">
-        <SH n="02" icon={Briefcase} title="Research & Experience" sub="2 active NYU labs · Software engineering" />
+        <SH icon={Briefcase} title="Research & Experience" sub="2 active NYU labs · Software engineering" />
 
         <div className="relative pl-12 space-y-6">
           <div className="tl-line" />
@@ -402,7 +392,7 @@ function Experience() {
 }
 
 /* ── Single project card ── */
-function ProjectCard({ p, featured }: { p: typeof allProjects[0]; featured: boolean }) {
+function ProjectCard({ p }: { p: typeof allProjects[0] }) {
   const DIcon = DomainIcon[p.id] ?? Code;
   return (
     <TiltCard className="card rounded-2xl overflow-hidden flex flex-col h-full group">
@@ -430,28 +420,19 @@ function ProjectCard({ p, featured }: { p: typeof allProjects[0]; featured: bool
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             )}
-            <a href={p.github} target="_blank" rel="noopener noreferrer"
-              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors">
-              <ArrowUpRight className="w-3.5 h-3.5" />
-            </a>
+            {p.github ? (
+              <a href={p.github} target="_blank" rel="noopener noreferrer"
+                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors" title="GitHub">
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </a>
+            ) : (
+              <span className="px-2 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-400 border border-slate-200">Soon</span>
+            )}
           </div>
         </div>
 
-        {/* Problem / Result / How */}
-        <div className="space-y-2.5 flex-1 mb-4 text-xs">
-          <div className="flex gap-2.5">
-            <span className="flex-shrink-0 font-black uppercase tracking-wide text-slate-400 w-12 pt-0.5">Problem</span>
-            <span className="text-slate-600 leading-relaxed">{p.problem}</span>
-          </div>
-          <div className="flex gap-2.5">
-            <span className="flex-shrink-0 font-black uppercase tracking-wide w-12 pt-0.5" style={{ color: "#059669" }}>Result</span>
-            <span className="text-slate-700 font-semibold leading-relaxed">{p.result}</span>
-          </div>
-          <div className="flex gap-2.5">
-            <span className="flex-shrink-0 font-black uppercase tracking-wide w-12 pt-0.5" style={{ color: p.color.from }}>How</span>
-            <span className="text-slate-500 leading-relaxed">{p.how}</span>
-          </div>
-        </div>
+        {/* Description */}
+        <p className="text-xs text-slate-600 leading-relaxed flex-1 mb-4">{p.description}</p>
 
         {/* Metrics */}
         <div className="flex flex-wrap gap-1.5 mb-3">
@@ -475,7 +456,7 @@ function Projects() {
   return (
     <section id="projects" className="relative z-10 py-28 px-6 sec-alt">
       <div className="max-w-6xl mx-auto">
-        <SH n="03" icon={Code} title="Projects" sub="Problem → Result → How across 8 projects" />
+        <SH icon={Code} title="Projects" sub="Problem → Result → How across 8 projects" />
 
         {/* Featured 4 — larger grid */}
         <div className="mb-5">
@@ -486,7 +467,7 @@ function Projects() {
           <div className="grid md:grid-cols-2 gap-5">
             {featured.map((p, i) => (
               <FadeIn key={p.id} delay={(i % 2) * 0.08}>
-                <ProjectCard p={p} featured={true} />
+                <ProjectCard p={p} />
               </FadeIn>
             ))}
           </div>
@@ -501,7 +482,7 @@ function Projects() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {more.map((p, i) => (
               <FadeIn key={p.id} delay={i * 0.07}>
-                <ProjectCard p={p} featured={false} />
+                <ProjectCard p={p} />
               </FadeIn>
             ))}
           </div>
@@ -551,7 +532,7 @@ function Contact() {
         <div className="absolute rounded-full" style={{ width: 400, height: 400, top: "50%", left: "50%", transform: "translate(-50%,-50%)", background: "radial-gradient(circle,rgba(99,102,241,0.06),transparent 70%)" }} />
       </div>
       <div className="max-w-3xl mx-auto text-center relative z-10">
-        <SH n="04" icon={Mail} title="Get In Touch" />
+        <SH icon={Mail} title="Get In Touch" />
 
         <FadeIn delay={0.1}>
           <p className="text-slate-500 text-base leading-relaxed mb-12 max-w-xl mx-auto">
