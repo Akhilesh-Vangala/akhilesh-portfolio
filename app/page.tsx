@@ -236,11 +236,6 @@ function Hero() {
       </div>
 
       <div className="relative z-10 max-w-5xl w-full mx-auto">
-        {/* Monogram */}
-        <motion.div initial={{opacity:0,scale:0.6}} animate={{opacity:1,scale:1}} transition={{duration:0.7,ease:[0.22,1,0.36,1]}} className="mx-auto mb-8 w-fit">
-          <div className="av-ring"><div className="w-24 h-24 rounded-full flex items-center justify-center bg-white"><span className="text-2xl font-black gt-shift">AV</span></div></div>
-        </motion.div>
-
         {/* Status pill */}
         <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{delay:0.1}}
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-6 bg-emerald-50 border border-emerald-200 text-emerald-700">
