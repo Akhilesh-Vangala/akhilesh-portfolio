@@ -12,6 +12,61 @@ import {
   coreValues, research, experience, hackathons, projects,
 } from "@/lib/data";
 
+/* ═══════════════════════════════════════════════════════════ NYU Torch */
+
+function NyuTorch({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 48 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Flame outer */}
+      <path d="M24 2C20 8 14 12 15 20C16 26 20 29 24 30C28 29 32 26 33 20C34 12 28 8 24 2Z" fill="url(#flameOuter)" />
+      {/* Flame inner */}
+      <path d="M24 10C22 14 19 17 20 21C21 24 22.5 25.5 24 26C25.5 25.5 27 24 28 21C29 17 26 14 24 10Z" fill="url(#flameInner)" />
+      {/* Flame core */}
+      <path d="M24 16C23 18 22 20 22.5 22C23 23.5 23.5 24 24 24C24.5 24 25 23.5 25.5 22C26 20 25 18 24 16Z" fill="white" opacity="0.9" />
+      {/* Cup top */}
+      <path d="M16 30H32L30 38H18L16 30Z" fill="url(#cupGrad)" />
+      {/* Cup bottom ring */}
+      <rect x="17" y="37" width="14" height="3" rx="1.5" fill="url(#cupGrad)" />
+      {/* Handle shaft */}
+      <rect x="21.5" y="40" width="5" height="22" rx="2.5" fill="url(#handleGrad)" />
+      {/* Base */}
+      <rect x="17" y="60" width="14" height="4" rx="2" fill="url(#handleGrad)" />
+      {/* Laurel left */}
+      <path d="M16 32C12 30 10 26 13 24C15 28 16 30 16 32Z" fill="url(#laurelGrad)" opacity="0.8" />
+      <path d="M16 36C11 35 9 31 12 29C14 33 15 35 16 36Z" fill="url(#laurelGrad)" opacity="0.7" />
+      {/* Laurel right */}
+      <path d="M32 32C36 30 38 26 35 24C33 28 32 30 32 32Z" fill="url(#laurelGrad)" opacity="0.8" />
+      <path d="M32 36C37 35 39 31 36 29C34 33 33 35 32 36Z" fill="url(#laurelGrad)" opacity="0.7" />
+      <defs>
+        <linearGradient id="flameOuter" x1="24" y1="2" x2="24" y2="30" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#f97316" /><stop offset="0.5" stopColor="#ef4444" /><stop offset="1" stopColor="#dc2626" />
+        </linearGradient>
+        <linearGradient id="flameInner" x1="24" y1="10" x2="24" y2="26" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#fbbf24" /><stop offset="1" stopColor="#f97316" />
+        </linearGradient>
+        <linearGradient id="cupGrad" x1="24" y1="30" x2="24" y2="40" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#c084fc" /><stop offset="1" stopColor="#7c3aed" />
+        </linearGradient>
+        <linearGradient id="handleGrad" x1="24" y1="40" x2="24" y2="64" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#a78bfa" /><stop offset="1" stopColor="#6d28d9" />
+        </linearGradient>
+        <linearGradient id="laurelGrad" x1="0" y1="0" x2="1" y2="0" gradientUnits="objectBoundingBox">
+          <stop stopColor="#86efac" /><stop offset="1" stopColor="#4ade80" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
+
+function NyuWordmark({ className = "" }: { className?: string }) {
+  return (
+    <span className={`font-black tracking-tight ${className}`}
+      style={{ background: "linear-gradient(135deg,#c084fc,#a855f7,#7c3aed)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+      NYU
+    </span>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════ SVG Icons */
 
 function GithubIcon({ className = "w-5 h-5" }: { className?: string }) {
@@ -296,12 +351,40 @@ function Hero() {
       </div>
 
       <div className="relative z-10 max-w-5xl w-full mx-auto">
-        {/* Monogram */}
-        <motion.div initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} className="mx-auto mb-8 w-fit">
-          <div className="av-ring">
-            <div className="w-24 h-24 rounded-full flex items-center justify-center" style={{ background: "#06060f" }}>
-              <span className="text-2xl font-black gt-shift">AV</span>
+
+        {/* ── NYU Hero Banner ── */}
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-auto mb-8 w-fit">
+          <div className="flex flex-col items-center gap-4">
+            {/* NYU Flag card */}
+            <div className="relative flex items-center gap-5 px-6 py-4 rounded-2xl overflow-hidden"
+              style={{ background: "rgba(87,6,140,0.12)", border: "1px solid rgba(192,132,252,0.25)", backdropFilter: "blur(16px)" }}>
+              {/* Purple glow behind */}
+              <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 30% 50%, rgba(168,85,247,0.1) 0%, transparent 70%)" }} />
+              {/* Torch */}
+              <NyuTorch className="w-10 h-14 relative z-10 float" />
+              {/* Text */}
+              <div className="relative z-10 text-left">
+                <div className="flex items-baseline gap-2">
+                  <NyuWordmark className="text-3xl" />
+                  <span className="text-white font-black text-lg tracking-tight">Courant</span>
+                </div>
+                <div className="text-xs text-purple-300 font-medium mt-0.5 tracking-wide">Institute of Mathematical Sciences</div>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <span className="text-xs font-mono px-2 py-0.5 rounded"
+                    style={{ background: "rgba(192,132,252,0.12)", border: "1px solid rgba(192,132,252,0.2)", color: "#e9d5ff" }}>
+                    MS Data Science · 2025–2027
+                  </span>
+                </div>
+              </div>
+              {/* Right: NYU shield mini */}
+              <div className="relative z-10 ml-2 w-10 h-12 flex-shrink-0">
+                <svg viewBox="0 0 40 48" fill="none" className="w-full h-full">
+                  <path d="M20 2L4 8V26C4 36 12 44 20 46C28 44 36 36 36 26V8L20 2Z" fill="rgba(87,6,140,0.5)" stroke="rgba(192,132,252,0.5)" strokeWidth="1" />
+                  <text x="50%" y="58%" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="13" fontWeight="900" fontFamily="system-ui">NYU</text>
+                </svg>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -509,24 +592,65 @@ function About() {
 
         {/* Education */}
         <FadeIn delay={0.2} className="mt-6">
-          <div className="glass rounded-2xl p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <GraduationCap className="w-5 h-5 text-indigo-400" />
-              <h3 className="text-lg font-bold text-white">Education</h3>
-            </div>
-            <div className="grid md:grid-cols-2 gap-8">
-              {education.map((e, i) => (
-                <div key={e.institution} className="pl-5 relative"
-                  style={{ borderLeft: "2px solid rgba(99,102,241,0.25)" }}>
-                  <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full"
-                    style={{ background: i === 0 ? "#6366f1" : "#a855f7", boxShadow: i === 0 ? "0 0 12px rgba(99,102,241,0.9)" : "0 0 12px rgba(168,85,247,0.9)" }} />
-                  <div className="text-xs font-mono mb-1" style={{ color: i === 0 ? "#818cf8" : "#c4b5fd" }}>{e.period}</div>
-                  <div className="font-bold text-white text-sm">{e.degree}</div>
-                  <div className="text-sm text-gray-500 mt-0.5">{e.institution}</div>
-                  <div className="text-sm font-bold mt-1.5" style={{ color: i === 0 ? "#4ade80" : "#a78bfa" }}></div>
-                  <div className="text-xs text-gray-700 mt-2 leading-relaxed">{e.courses}</div>
+          <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
+            {/* NYU featured card */}
+            <div className="relative p-8 overflow-hidden"
+              style={{ background: "linear-gradient(135deg, rgba(87,6,140,0.25) 0%, rgba(124,58,237,0.12) 50%, rgba(13,13,35,0.9) 100%)" }}>
+              {/* NYU purple glow */}
+              <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full pointer-events-none"
+                style={{ background: "radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 70%)" }} />
+              <div className="absolute inset-0 pointer-events-none"
+                style={{ background: "linear-gradient(135deg, rgba(87,6,140,0.1) 0%, transparent 60%)" }} />
+
+              <div className="relative z-10 flex flex-wrap items-start gap-6">
+                {/* Torch */}
+                <div className="flex-shrink-0">
+                  <NyuTorch className="w-12 h-16 float" />
                 </div>
-              ))}
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-3 mb-2">
+                    <div className="flex items-baseline gap-2">
+                      <NyuWordmark className="text-2xl" />
+                      <span className="text-white font-black text-lg">Courant Institute</span>
+                    </div>
+                    <span className="chip chip-v text-xs">Current</span>
+                  </div>
+                  <div className="font-bold text-white mb-1">{education[0].degree}</div>
+                  <div className="text-xs font-mono text-purple-300 mb-3">{education[0].period}</div>
+                  <div className="text-xs text-gray-500 leading-relaxed">{education[0].courses}</div>
+                </div>
+                {/* NYU shield */}
+                <div className="flex-shrink-0">
+                  <div className="w-14 h-16">
+                    <svg viewBox="0 0 56 64" fill="none" className="w-full h-full">
+                      <path d="M28 3L5 11V35C5 50 16 59 28 62C40 59 51 50 51 35V11L28 3Z"
+                        fill="rgba(87,6,140,0.4)" stroke="rgba(192,132,252,0.4)" strokeWidth="1.5" />
+                      <path d="M28 10L10 16V34C10 46 18 53 28 56C38 53 46 46 46 34V16L28 10Z"
+                        fill="rgba(87,6,140,0.3)" />
+                      <text x="50%" y="52%" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="11" fontWeight="900" fontFamily="system-ui" letterSpacing="0.5">NYU</text>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* GITAM card */}
+            <div className="p-8 border-t" style={{ background: "rgba(13,13,35,0.6)", borderColor: "rgba(255,255,255,0.05)" }}>
+              <div className="flex flex-wrap items-start gap-6">
+                <div className="flex-shrink-0 w-12 h-16 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-black"
+                    style={{ background: "linear-gradient(135deg,rgba(99,102,241,0.3),rgba(168,85,247,0.2))", border: "1px solid rgba(99,102,241,0.2)", color: "#a5b4fc" }}>
+                    GIT
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="font-bold text-white mb-0.5">{education[1].degree}</div>
+                  <div className="text-sm text-gray-500 mb-1">{education[1].institution}</div>
+                  <div className="text-xs font-mono text-indigo-400 mb-2">{education[1].period}</div>
+                  <div className="text-xs text-gray-700 leading-relaxed">{education[1].courses}</div>
+                </div>
+              </div>
             </div>
           </div>
         </FadeIn>
@@ -542,6 +666,18 @@ function Research() {
     <section id="research" className="relative z-10 py-32 px-6">
       <div className="max-w-7xl mx-auto">
         <SH n="02" icon={FlaskConical} title="Research Experience" sub="Active in 2 NYU labs — genomics, bioinformatics, statistical modeling" />
+        {/* NYU Lab banner */}
+        <FadeIn delay={0.05} className="mb-10 -mt-6">
+          <div className="inline-flex items-center gap-3 px-5 py-3 rounded-xl"
+            style={{ background: "rgba(87,6,140,0.1)", border: "1px solid rgba(192,132,252,0.18)" }}>
+            <NyuTorch className="w-5 h-7" />
+            <div className="flex items-center gap-2">
+              <NyuWordmark className="text-base" />
+              <span className="text-purple-200 text-sm font-semibold">Graduate Research</span>
+              <span className="text-gray-600 text-xs">· Rory Meyers College of Nursing &amp; Hochwagen Lab</span>
+            </div>
+          </div>
+        </FadeIn>
         <div className="relative pl-12 space-y-8">
           <div className="tl-line" />
           {research.map((r, i) => (
